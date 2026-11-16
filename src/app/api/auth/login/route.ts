@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { signToken, setCookieToken, logActivity } from "@/lib/auth";
@@ -26,10 +25,6 @@ export async function POST(req: NextRequest) {
 
     const token = await signToken({ userId: user.id, email: user.email, role: user.role, name: user.name });
     const cookieOptions = setCookieToken(token);
-
-    // Set cookie in both cookieStore and response headers for maximum cross-browser reliability
-    const cookieStore = await cookies();
-    cookieStore.set(cookieOptions);
 
     await logActivity({
       userId: user.id,
