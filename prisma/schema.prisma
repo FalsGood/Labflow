@@ -1,0 +1,102 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  admin
+  siswa
+}
+
+enum Condition {
+  baik
+  rusak_ringan
+  rusak_berat
+}
+
+enum BorrowStatus {
+  pending
+  approved
+  rejected
+  borrowed
+  returned
+  overdue
+}
+
+model User {
+  id           String        @id @default(uuid())
+  name         String
+  email        String        @unique
+  nisnNip      String        @unique
+  password     String
+  role         Role          @default(siswa)
+  phoneNumber  String?
+  isActive     Boolean       @default(true)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  borrowings   Borrowing[]   @relation("StudentBorrowings")
+  approvedLogs Borrowing[]   @relation("AdminApprovals")
+  activityLogs ActivityLog[]
+}
+
+model Category {
+  id          String   @id @default(uuid())
+  name        String
+  slug        String   @unique
+  description String?
+  items       Item[]
+}
+
+model Item {
+  id             String      @id @default(uuid())
+  categoryId     String
+  category       Category    @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  itemCode       String      @unique
+  name           String
+  totalStock     Int
+  availableStock Int
+  condition      Condition   @default(baik)
+  location       String
+  imageUrl       String?
+  isDeleted      Boolean     @default(false)
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  borrowings     Borrowing[]
+}
+
+model Borrowing {
+  id                 String       @id @default(uuid())
+  transactionCode    String       @unique
+  userId             String
+  user               User         @relation("StudentBorrowings", fields: [userId], references: [id], onDelete: Restrict)
+  itemId             String
+  item               Item         @relation(fields: [itemId], references: [id], onDelete: Restrict)
+  quantity           Int
+  borrowDate         DateTime
+  returnExpectedDate DateTime
+  returnActualDate   DateTime?
+  status             BorrowStatus @default(pending)
+  notes              String?
+  adminNotes         String?
+  adminId            String?
+  admin              User?        @relation("AdminApprovals", fields: [adminId], references: [id])
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+}
+
+model ActivityLog {
+  id        String   @id @default(uuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  action    String
+  context   String?
+  ipAddress String?
+  createdAt DateTime @default(now())
+}
