@@ -39,8 +39,9 @@ export async function POST(req: NextRequest) {
     });
     response.cookies.set(cookieOptions);
     return response;
-  } catch (err) {
-    console.error(err);
-    return NextResponse.json({ success: false, error: "Server error" }, { status: 500 });
+  } catch (err: unknown) {
+    console.error("Login error:", err);
+    const message = err instanceof Error ? err.message : "Terjadi kesalahan server saat login";
+    return NextResponse.json({ success: false, error: message }, { status: 500 });
   }
 }
