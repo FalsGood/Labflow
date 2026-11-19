@@ -18,6 +18,7 @@ import { ItemPublic, CategoryPublic, ItemCondition } from "@/types";
 import { StockBadge, ConditionBadge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
+import ImageUploader from "@/components/ui/ImageUploader";
 
 interface ItemFormData {
   categoryId: string;
@@ -438,22 +439,11 @@ export default function AdminItemsPage() {
           </div>
 
           <div>
-            <label className="block font-bold text-slate-700 mb-1">URL Gambar / Foto Barang (Opsional)</label>
-            <input
-              type="url"
-              value={formData.imageUrl}
-              onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-              placeholder="https://images.unsplash.com/photo-..."
-              className="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500"
+            <ImageUploader
+              value={formData.imageUrl || undefined}
+              onChange={(url) => setFormData({ ...formData, imageUrl: url })}
+              label="Foto Barang (Opsional)"
             />
-            {formData.imageUrl && (
-              <div className="mt-2 flex items-center gap-2 p-2 bg-slate-50 border border-slate-200 rounded-xl">
-                <div className="w-12 h-12 rounded-lg overflow-hidden relative border border-slate-200 shrink-0">
-                  <Image src={formData.imageUrl} alt="Pratinjau" fill className="object-cover" sizes="48px" />
-                </div>
-                <span className="text-[11px] text-slate-600 font-medium">Pratinjau foto barang aktif</span>
-              </div>
-            )}
           </div>
 
           <div className="pt-3 border-t border-slate-100 flex justify-end gap-2">
